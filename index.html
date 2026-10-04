@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>ARM Tap - Telegram Mini App</title>
+  
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- TON Connect UI SDK -->
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    body {
+      background-color: #121824;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #0088cc;
+    }
+    .balance-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .balance-label {
+      font-size: 14px;
+      color: #aaaaaa;
+    }
+    .balance-amount {
+      font-size: 42px;
+      font-weight: 800;
+      color: #ffd700;
+      margin-top: 5px;
+    }
+    .click-area {
+      position: relative;
+      margin: 40px 0;
+    }
+    .tap-button {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #0088cc 0%, #005588 100%);
+      box-shadow: 0 0 30px rgba(0, 136, 204, 0.6);
+      border: 4px solid #00aaff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.08s ease;
+    }
+    .tap-button:active {
+      transform: scale(0.93);
+    }
+    .wallet-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    #ton-connect {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="title">ARM Tap</div>
+    <div id="user-name"></div>
+  </div>
+
+  <!-- Balance Section -->
+  <div class="balance-container">
+    <div class="balance-label">Ձեր ARM Բալանսը</div>
+    <div class="balance-amount" id="balance">0</div>
+  </div>
+
+  <!-- Clicker Button -->
+  <div class="click-area">
+    <div class="tap-button" id="tap-btn">ARM</div>
+  </div>
+
+  <!-- TON Wallet Section -->
+  <div class="wallet-section">
+    <div id="ton-connect"></div>
+  </div>
+
+  <script>
+    // Telegram WebApp Ինիցիալիզացիա
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.expand();
+      if (tg.initDataUnsafe?.user) {
+        document.getElementById('user-name').innerText = `@${tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name}`;
+      }
+    }
+
+    // Կոնֆիգուրացիա
+    const ARM_TOKEN_CONTRACT = "EQB7bzPDOh29TLaZn-GG6Gbtn0nggQIZ2EwZ4gH5W3HwCqAB";
+    const OWNER_WALLET = "UQAnv9Zcl18bYXVLFL0nNWDqtnAexxgI9dQ4s8JPiCaJ_ZTq";
+
+    // Tap / Balance Տրամաբանություն
+    let balance = parseInt(localStorage.getItem('arm_balance')) || 0;
+    const balanceEl = document.getElementById('balance');
+    const tapBtn = document.getElementById('tap-btn');
+
+    balanceEl.innerText = balance;
+
+    tapBtn.addEventListener('click', () => {
+      balance += 1;
+      balanceEl.innerText = balance;
+      localStorage.setItem('arm_balance', balance);
+      
+      if (tg && tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
+    });
+
+    // TON Connect UI Ինիցիալիզացիա
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: 'https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/test/public/tonconnect-manifest.json',
+      buttonRootId: 'ton-connect'
+    });
+
+    tonConnectUI.onStatusChange(wallet => {
+      if (wallet) {
+        console.log('Քսակը միացված է:', wallet.account.address);
+      } else {
+        console.log('Քսակը անջատված է');
+      }
+    });
+  </script>
+</body>
+</html>
