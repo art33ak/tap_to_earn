@@ -1,284 +1,199 @@
 <!DOCTYPE html>
-<html lang="hy">
+<html lang="hy" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ARM Tap Game</title>
-    <!-- Telegram Mini App SDK & TON Connect SDK -->
+    <title>ARM TAP Mini App</title>
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        * {
-            box-sizing: border-box;
+        body {
             user-select: none;
             -webkit-user-select: none;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: manipulation;
         }
-        body {
-            background-color: #121318;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            overflow: hidden;
-        }
-        /* Header & Wallet Section */
-        header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-        }
-        .app-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #f3ba2f;
-        }
-        #ton-connect {
-            z-index: 10;
-        }
-        
-        /* Stats Display */
-        .stats-container {
-            text-align: center;
-            margin-top: 10px;
-        }
-        .balance-title {
-            font-size: 14px;
-            color: #8a8d93;
-            margin-bottom: 5px;
-        }
-        .balance {
-            font-size: 40px;
-            font-weight: 800;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .balance span {
-            color: #f3ba2f;
-        }
-
-        /* Tap Area */
-        .tap-area {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
-        }
-        .coin-btn {
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #f3ba2f 0%, #d49509 100%);
-            border: 8px solid #332709;
-            box-shadow: 0 0 30px rgba(243, 186, 47, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.08s ease;
-        }
-        .coin-btn:active {
+        /* Tap Coin Animation */
+        .tap-btn:active {
             transform: scale(0.95);
         }
-        .coin-text {
-            font-size: 32px;
-            font-weight: 900;
-            color: #121318;
-            letter-spacing: 2px;
+        /* Neon Glow Effect */
+        .neon-glow {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
         }
-
-        /* Floating Numbers Animation */
-        .float-number {
-            position: absolute;
-            font-size: 28px;
-            font-weight: bold;
-            color: #f3ba2f;
-            pointer-events: none;
-            animation: floatUp 0.8s ease-out forwards;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-80px); }
-        }
-
-        /* Energy & Progress Bar */
-        .energy-container {
-            width: 100%;
-            max-width: 320px;
-            margin-bottom: 15px;
-        }
-        .energy-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin-bottom: 5px;
-            color: #aaa;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 12px;
-            background-color: #242731;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(90deg, #f3ba2f, #ff8c00);
-            transition: width 0.2s ease;
-        }
-
-        /* Navigation Bar */
-        nav {
-            width: 100%;
-            background-color: #1d1f27;
-            border-radius: 15px;
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #8a8d93;
-            font-size: 12px;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .nav-item.active {
-            color: #f3ba2f;
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
     </style>
 </head>
-<body>
+<body class="bg-[#0b0f19] text-white min-h-screen flex flex-col justify-between font-sans pb-20 select-none overflow-hidden">
 
-    <!-- Header / Wallet -->
-    <header>
-        <div class="app-title">ARM TAP</div>
-        <div id="ton-connect"></div>
+    <!-- Top Header: Profile Info -->
+    <header class="px-5 pt-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center font-bold text-lg border border-blue-400/30">
+                👤
+            </div>
+            <div>
+                <h4 id="user-name" class="font-bold text-sm text-slate-200">Player</h4>
+                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">Novice Miner</span>
+            </div>
+        </div>
+
+        <!-- Daily Spin Button -->
+        <button onclick="switchTab('spin')" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-lg shadow-purple-500/20 border border-purple-400/30 active:scale-95 transition">
+            <i class="fa-solid fa-arrows-spin text-amber-300"></i> Daily Spin
+        </button>
     </header>
 
-    <!-- Main Balance Area -->
-    <div class="stats-container">
-        <div class="balance-title">ARM Token Balance</div>
-        <div class="balance"><span id="score">0</span> ARM</div>
-    </div>
+    <!-- MAIN TAB: HOME (Tap / Balance) -->
+    <main id="tab-home" class="flex-1 flex flex-col items-center justify-center px-4 py-6 text-center">
+        
+        <!-- Total Balance Showcase -->
+        <div class="mb-6">
+            <span class="text-xs text-slate-400 tracking-wider uppercase">Your ARM Balance</span>
+            <div class="flex items-center justify-center gap-2 mt-1">
+                <span class="text-3xl text-amber-400">🪙</span>
+                <h1 id="balance" class="text-4xl md:text-5xl font-black bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+                    1,250.00
+                </h1>
+            </div>
+        </div>
 
-    <!-- Tapping Circle -->
-    <div class="tap-area">
-        <div class="coin-btn" id="coin">
-            <div class="coin-text">ARM</div>
+        <!-- Central Tap Button / Main Coin Avatar -->
+        <div class="relative my-auto flex items-center justify-center">
+            <div class="absolute w-64 h-64 bg-blue-600/20 rounded-full blur-3xl -z-10 animate-pulse"></div>
+            
+            <button id="tap-button" onclick="handleTap(event)" class="tap-btn w-56 h-56 md:w-64 md:h-64 rounded-full bg-gradient-to-b from-blue-500 via-indigo-600 to-purple-700 p-2 shadow-2xl neon-glow transition-transform duration-100 focus:outline-none flex items-center justify-center border-4 border-blue-400/40">
+                <div class="w-full h-full rounded-full bg-[#0d1424] flex flex-col items-center justify-center border border-white/10">
+                    <span class="text-6xl md:text-7xl mb-1">🇦🇲</span>
+                    <span class="font-black text-xl tracking-wider bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">ARM TAP</span>
+                </div>
+            </button>
         </div>
-    </div>
 
-    <!-- Energy Section -->
-    <div class="energy-container">
-        <div class="energy-text">
-            <span>⚡ Energy</span>
-            <span><span id="energy">1000</span> / <span id="max-energy">1000</span></span>
+        <!-- Energy Bar Info -->
+        <div class="w-full max-w-xs mt-6">
+            <div class="flex justify-between text-xs text-slate-400 mb-1 font-semibold">
+                <span>⚡ Energy</span>
+                <span><span id="energy">1000</span> / 1000</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-3 p-0.5 border border-slate-700">
+                <div id="energy-bar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full w-full transition-all duration-200"></div>
+            </div>
         </div>
-        <div class="progress-bar">
-            <div class="progress-fill" id="energy-bar"></div>
-        </div>
-    </div>
+    </main>
 
-    <!-- Bottom Navigation -->
-    <nav>
-        <div class="nav-item active">
-            <span>⛏️</span>
-            <span>Tap</span>
+    <!-- OTHER TABS (FARM, TASKS, FRIENDS) - Placeholders -->
+    <main id="tab-farm" class="hidden flex-1 px-5 py-8 text-center">
+        <h2 class="text-2xl font-bold mb-2">🚜 Auto-Farming</h2>
+        <p class="text-xs text-slate-400 mb-6">Earn ARM tokens passively every hour</p>
+        <div class="glass-card p-6 rounded-3xl border border-slate-800">
+            <p class="text-sm text-slate-300 mb-4">Farming Rate: <strong class="text-blue-400">+50 ARM/hr</strong></p>
+            <button class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-2xl shadow-lg shadow-blue-500/30">
+                Start Farming (8h)
+            </button>
         </div>
-        <div class="nav-item" onclick="alert('Ռեֆերալային հղումը պատճենված է:')">
-            <span>👥</span>
-            <span>Ref</span>
+    </main>
+
+    <main id="tab-tasks" class="hidden flex-1 px-5 py-8">
+        <h2 class="text-2xl font-bold mb-4 text-center">📋 Complete Tasks</h2>
+        <div class="space-y-3">
+            <div class="glass-card p-4 rounded-2xl flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-brands fa-telegram text-2xl text-blue-400"></i>
+                    <div class="text-left">
+                        <h4 class="font-bold text-sm">Join Telegram Channel</h4>
+                        <span class="text-xs text-amber-400">+500 ARM</span>
+                    </div>
+                </div>
+                <button class="bg-slate-800 text-xs px-3 py-2 rounded-xl font-bold border border-slate-700">Join</button>
+            </div>
         </div>
-        <div class="nav-item" onclick="alert('Առաջադրանքները շուտով:')">
-            <span>📋</span>
-            <span>Tasks</span>
-        </div>
+    </main>
+
+    <main id="tab-friends" class="hidden flex-1 px-5 py-8 text-center">
+        <h2 class="text-2xl font-bold mb-2">👥 Invite Friends</h2>
+        <p class="text-xs text-slate-400 mb-6">Earn 10% from your referral earnings</p>
+        <button class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg">
+            Invite a Friend 🚀
+        </button>
+    </main>
+
+    <!-- Bottom Navigation Bar (Fixed) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#090d16]/95 backdrop-blur-md border-t border-slate-800/80 px-6 py-2 flex justify-between items-center z-50">
+        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-blue-400 transition">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] font-bold">Home</span>
+        </button>
+        <button onclick="switchTab('farm')" id="nav-farm" class="flex flex-col items-center gap-1 text-slate-500 transition">
+            <i class="fa-solid fa-tractor text-lg"></i>
+            <span class="text-[10px] font-bold">Farm</span>
+        </button>
+        <button onclick="switchTab('tasks')" id="nav-tasks" class="flex flex-col items-center gap-1 text-slate-500 transition">
+            <i class="fa-solid fa-list-check text-lg"></i>
+            <span class="text-[10px] font-bold">Tasks</span>
+        </button>
+        <button onclick="switchTab('friends')" id="nav-friends" class="flex flex-col items-center gap-1 text-slate-500 transition">
+            <i class="fa-solid fa-users text-lg"></i>
+            <span class="text-[10px] font-bold">Friends</span>
+        </button>
     </nav>
 
+    <!-- Mini Script Logic -->
     <script>
-        // Game Logic Variables
-        let score = 0;
+        // Init Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        if (tg) {
+            tg.expand();
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name;
+            }
+        }
+
+        let balance = 1250;
         let energy = 1000;
-        const maxEnergy = 1000;
-        const tapPower = 1;
 
-        const scoreEl = document.getElementById('score');
-        const energyEl = document.getElementById('energy');
-        const energyBar = document.getElementById('energy-bar');
-        const coinBtn = document.getElementById('coin');
+        function handleTap(e) {
+            if (energy <= 0) return;
 
-        // Tap Click Event
-        coinBtn.addEventListener('click', (e) => {
-            if (energy >= tapPower) {
-                score += tapPower;
-                energy -= tapPower;
+            balance += 1;
+            energy -= 1;
 
-                updateUI();
-                createFloatingNumber(e.clientX, e.clientY);
+            document.getElementById('balance').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('energy').innerText = energy;
+            document.getElementById('energy-bar').style.width = (energy / 1000 * 100) + '%';
 
-                // Telegram Vibrate Feedback
-                if (window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                }
-            }
-        });
+            // Floating +1 Animation
+            const touch = e.touches ? e.touches[0] : e;
+            const floatText = document.createElement('div');
+            floatText.innerText = '+1';
+            floatText.className = 'absolute text-2xl font-black text-amber-400 pointer-events-none animate-bounce';
+            floatText.style.left = `${touch.clientX - 10}px`;
+            floatText.style.top = `${touch.clientY - 30}px`;
+            document.body.appendChild(floatText);
 
-        // Create +1 animation on screen
-        function createFloatingNumber(x, y) {
-            const num = document.createElement('div');
-            num.className = 'float-number';
-            num.innerText = `+${tapPower}`;
-            num.style.left = `${x - 15}px`;
-            num.style.top = `${y - 30}px`;
-            
-            document.body.appendChild(num);
-
-            setTimeout(() => {
-                num.remove();
-            }, 800);
+            setTimeout(() => floatText.remove(), 800);
         }
 
-        // Update Balance and Energy Bar
-        function updateUI() {
-            scoreEl.innerText = score;
-            energyEl.innerText = energy;
-            const percentage = (energy / maxEnergy) * 100;
-            energyBar.style.width = `${percentage}%`;
-        }
+        function switchTab(tabName) {
+            ['home', 'farm', 'tasks', 'friends'].forEach(t => {
+                const mainEl = document.getElementById(`tab-${t}`);
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (mainEl) mainEl.classList.add('hidden');
+                if (navBtn) navBtn.className = 'flex flex-col items-center gap-1 text-slate-500 transition';
+            });
 
-        // Energy Auto-Recovery (1 energy per second)
-        setInterval(() => {
-            if (energy < maxEnergy) {
-                energy += 1;
-                updateUI();
-            }
-        }, 1000);
-
-        // TON Connect Integration Setup
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/public/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect'
-        });
-
-        // Initialize Telegram WebApp SDK
-        if (window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
+            const activeTab = document.getElementById(`tab-${tabName}`);
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if (activeTab) activeTab.classList.remove('hidden');
+            if (activeNav) activeNav.className = 'flex flex-col items-center gap-1 text-blue-400 transition';
         }
     </script>
 </body>
