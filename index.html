@@ -19,11 +19,11 @@
         }
         /* Tap Coin Animation */
         .tap-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.94);
         }
         /* Neon Glow Effect */
         .neon-glow {
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 30px rgba(234, 179, 8, 0.35);
         }
         .glass-card {
             background: rgba(30, 41, 59, 0.7);
@@ -34,76 +34,91 @@
 </head>
 <body class="bg-[#0b0f19] text-white min-h-screen flex flex-col justify-between font-sans pb-20 select-none overflow-hidden">
 
-    <!-- Top Header: Profile Info -->
-    <header class="px-5 pt-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center font-bold text-lg border border-blue-400/30">
-                👤
+    <!-- Top Header: Profile Info + Language Selector + Admin Button -->
+    <header class="px-4 pt-4 flex justify-between items-center gap-2">
+        <div class="flex items-center space-x-2">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-amber-500 p-0.5 flex items-center justify-center font-bold text-lg border border-amber-400/30 overflow-hidden shadow-lg">
+                <img id="user-avatar" src="logo.jpg" alt="User" class="w-full h-full object-cover rounded-full">
             </div>
             <div>
-                <h4 id="user-name" class="font-bold text-sm text-slate-200">Player</h4>
-                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">Novice Miner</span>
+                <h4 id="user-name" class="font-bold text-xs md:text-sm text-slate-200 truncate max-w-[100px]">Player</h4>
+                <span id="txt-miner" class="text-[9px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 font-semibold" data-i18n="minerTag">Novice Miner</span>
             </div>
         </div>
 
-        <!-- Daily Spin Button -->
-        <button onclick="switchTab('spin')" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-lg shadow-purple-500/20 border border-purple-400/30 active:scale-95 transition">
-            <i class="fa-solid fa-arrows-spin text-amber-300"></i> Daily Spin
-        </button>
+        <!-- Controls: Language Selector & Admin Button & Daily Spin -->
+        <div class="flex items-center gap-2">
+            <!-- Admin Panel Button (Hidden by default, shown for admins) -->
+            <button id="admin-btn" onclick="openAdminModal()" class="hidden bg-red-600/80 hover:bg-red-600 text-white text-[11px] px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1 border border-red-500/50 shadow-md">
+                <i class="fa-solid fa-user-shield"></i> <span data-i18n="adminBtn">Admin</span>
+            </button>
+
+            <!-- Language Switcher Select -->
+            <select id="langSelect" onchange="changeAppLanguage(this.value)" class="bg-slate-800 text-[11px] text-gray-200 font-bold rounded-xl px-2 py-1 border border-slate-700 focus:outline-none focus:border-amber-500 transition cursor-pointer">
+                <option value="hy">🇦🇲 HY</option>
+                <option value="en">🇬🇧 ENG</option>
+                <option value="ru">🇷🇺 РУС</option>
+            </select>
+
+            <!-- Daily Spin Button -->
+            <button onclick="switchTab('spin')" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-[11px] px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1 shadow-lg shadow-purple-500/20 border border-purple-400/30 active:scale-95 transition">
+                <i class="fa-solid fa-arrows-spin text-amber-300"></i> Spin
+            </button>
+        </div>
     </header>
 
     <!-- MAIN TAB: HOME (Tap / Balance) -->
-    <main id="tab-home" class="flex-1 flex flex-col items-center justify-center px-4 py-6 text-center">
+    <main id="tab-home" class="flex-1 flex flex-col items-center justify-center px-4 py-4 text-center">
         
         <!-- Total Balance Showcase -->
-        <div class="mb-6">
-            <span class="text-xs text-slate-400 tracking-wider uppercase">Your ARM Balance</span>
+        <div class="mb-4">
+            <span class="text-xs text-slate-400 tracking-wider uppercase font-semibold" data-i18n="balanceTitle">Your ARM Balance</span>
             <div class="flex items-center justify-center gap-2 mt-1">
-                <span class="text-3xl text-amber-400">🪙</span>
-                <h1 id="balance" class="text-4xl md:text-5xl font-black bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+                <span class="text-3xl">🪙</span>
+                <h1 id="balance" class="text-4xl md:text-5xl font-black bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
                     1,250.00
                 </h1>
             </div>
         </div>
 
-        <!-- Central Tap Button / Main Coin Avatar -->
+        <!-- Central Tap Button with New Custom Logo -->
         <div class="relative my-auto flex items-center justify-center">
-            <div class="absolute w-64 h-64 bg-blue-600/20 rounded-full blur-3xl -z-10 animate-pulse"></div>
+            <div class="absolute w-64 h-64 bg-amber-500/20 rounded-full blur-3xl -z-10 animate-pulse"></div>
             
-            <button id="tap-button" onclick="handleTap(event)" class="tap-btn w-56 h-56 md:w-64 md:h-64 rounded-full bg-gradient-to-b from-blue-500 via-indigo-600 to-purple-700 p-2 shadow-2xl neon-glow transition-transform duration-100 focus:outline-none flex items-center justify-center border-4 border-blue-400/40">
-                <div class="w-full h-full rounded-full bg-[#0d1424] flex flex-col items-center justify-center border border-white/10">
-                    <span class="text-6xl md:text-7xl mb-1">🇦🇲</span>
-                    <span class="font-black text-xl tracking-wider bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">ARM TAP</span>
+            <button id="tap-button" onclick="handleTap(event)" class="tap-btn w-60 h-60 md:w-68 md:h-68 rounded-full bg-gradient-to-b from-amber-400 via-amber-600 to-yellow-700 p-2.5 shadow-2xl neon-glow transition-transform duration-100 focus:outline-none flex items-center justify-center border-4 border-amber-300/60 overflow-hidden">
+                <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center border-2 border-amber-200/40 relative">
+                    <!-- Custom Tap Image -->
+                    <img src="logo.jpg" alt="ARM TAP Logo" class="w-full h-full object-cover pointer-events-none transform hover:scale-105 transition">
                 </div>
             </button>
         </div>
 
         <!-- Energy Bar Info -->
-        <div class="w-full max-w-xs mt-6">
+        <div class="w-full max-w-xs mt-4">
             <div class="flex justify-between text-xs text-slate-400 mb-1 font-semibold">
-                <span>⚡ Energy</span>
+                <span>⚡ <span data-i18n="energyText">Energy</span></span>
                 <span><span id="energy">1000</span> / 1000</span>
             </div>
             <div class="w-full bg-slate-800 rounded-full h-3 p-0.5 border border-slate-700">
-                <div id="energy-bar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full w-full transition-all duration-200"></div>
+                <div id="energy-bar" class="bg-gradient-to-r from-amber-400 to-yellow-500 h-2 rounded-full w-full transition-all duration-200"></div>
             </div>
         </div>
     </main>
 
-    <!-- OTHER TABS (FARM, TASKS, FRIENDS) - Placeholders -->
+    <!-- OTHER TABS -->
     <main id="tab-farm" class="hidden flex-1 px-5 py-8 text-center">
         <h2 class="text-2xl font-bold mb-2">🚜 Auto-Farming</h2>
-        <p class="text-xs text-slate-400 mb-6">Earn ARM tokens passively every hour</p>
+        <p class="text-xs text-slate-400 mb-6" data-i18n="farmDesc">Earn ARM tokens passively every hour</p>
         <div class="glass-card p-6 rounded-3xl border border-slate-800">
-            <p class="text-sm text-slate-300 mb-4">Farming Rate: <strong class="text-blue-400">+50 ARM/hr</strong></p>
-            <button class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-2xl shadow-lg shadow-blue-500/30">
+            <p class="text-sm text-slate-300 mb-4">Farming Rate: <strong class="text-amber-400">+50 ARM/hr</strong></p>
+            <button class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-2xl shadow-lg shadow-amber-500/20">
                 Start Farming (8h)
             </button>
         </div>
     </main>
 
     <main id="tab-tasks" class="hidden flex-1 px-5 py-8">
-        <h2 class="text-2xl font-bold mb-4 text-center">📋 Complete Tasks</h2>
+        <h2 class="text-2xl font-bold mb-4 text-center" data-i18n="tasksTitle">📋 Complete Tasks</h2>
         <div class="space-y-3">
             <div class="glass-card p-4 rounded-2xl flex justify-between items-center">
                 <div class="flex items-center gap-3">
@@ -119,34 +134,59 @@
     </main>
 
     <main id="tab-friends" class="hidden flex-1 px-5 py-8 text-center">
-        <h2 class="text-2xl font-bold mb-2">👥 Invite Friends</h2>
-        <p class="text-xs text-slate-400 mb-6">Earn 10% from your referral earnings</p>
-        <button class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg">
+        <h2 class="text-2xl font-bold mb-2" data-i18n="friendsTitle">👥 Invite Friends</h2>
+        <p class="text-xs text-slate-400 mb-6" data-i18n="friendsDesc">Earn 10% from your referral earnings</p>
+        <button class="bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 font-black py-3.5 px-6 rounded-2xl shadow-lg">
             Invite a Friend 🚀
         </button>
     </main>
 
+    <!-- ADMIN PANEL MODAL (Popup) -->
+    <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-sm rounded-3xl p-6 border border-red-500/30 text-left relative">
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="text-xl font-bold text-red-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-user-shield"></i> Admin Panel
+            </h3>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">Add Balance to User ID:</label>
+                    <input type="text" placeholder="User Telegram ID" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-white">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">ARM Amount:</label>
+                    <input type="number" placeholder="1000" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-white">
+                </div>
+                <button class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 rounded-xl transition mt-2">
+                    Give Reward
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Bottom Navigation Bar (Fixed) -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-[#090d16]/95 backdrop-blur-md border-t border-slate-800/80 px-6 py-2 flex justify-between items-center z-50">
-        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-blue-400 transition">
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#090d16]/95 backdrop-blur-md border-t border-slate-800/80 px-6 py-2 flex justify-between items-center z-40">
+        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-amber-400 transition">
             <i class="fa-solid fa-house text-lg"></i>
-            <span class="text-[10px] font-bold">Home</span>
+            <span class="text-[10px] font-bold" data-i18n="navHome">Home</span>
         </button>
         <button onclick="switchTab('farm')" id="nav-farm" class="flex flex-col items-center gap-1 text-slate-500 transition">
             <i class="fa-solid fa-tractor text-lg"></i>
-            <span class="text-[10px] font-bold">Farm</span>
+            <span class="text-[10px] font-bold" data-i18n="navFarm">Farm</span>
         </button>
         <button onclick="switchTab('tasks')" id="nav-tasks" class="flex flex-col items-center gap-1 text-slate-500 transition">
             <i class="fa-solid fa-list-check text-lg"></i>
-            <span class="text-[10px] font-bold">Tasks</span>
+            <span class="text-[10px] font-bold" data-i18n="navTasks">Tasks</span>
         </button>
         <button onclick="switchTab('friends')" id="nav-friends" class="flex flex-col items-center gap-1 text-slate-500 transition">
             <i class="fa-solid fa-users text-lg"></i>
-            <span class="text-[10px] font-bold">Friends</span>
+            <span class="text-[10px] font-bold" data-i18n="navFriends">Friends</span>
         </button>
     </nav>
 
-    <!-- Mini Script Logic -->
+    <!-- App Logic & Scripts -->
     <script>
         // Init Telegram WebApp
         const tg = window.Telegram.WebApp;
@@ -154,11 +194,74 @@
             tg.expand();
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name;
+                
+                // Show Admin Panel Button for specific Admin Telegram ID
+                // Լրացրեք ձեր Telegram ID-ն այստեղ
+                const adminTelegramID = 123456789; 
+                if (tg.initDataUnsafe.user.id === adminTelegramID) {
+                    document.getElementById('admin-btn').classList.remove('hidden');
+                }
             }
         }
 
         let balance = 1250;
         let energy = 1000;
+
+        // Translations Dictionary
+        const i18n = {
+            hy: {
+                minerTag: "Նորեկ Մայներ",
+                balanceTitle: "Ձեր ARM Բալանսը",
+                energyText: "Էներգիա",
+                adminBtn: "Ադմին",
+                farmDesc: "Վաստակեք ARM տոկեններ պասիվ եղանակով ամեն ժամ",
+                tasksTitle: "📋 Կատարեք Առաջադրանքներ",
+                friendsTitle: "👥 Հրավիրեք Ընկերների",
+                friendsDesc: "Ստացեք 10% ձեր հրավիրած ընկերների եկամտից",
+                navHome: "Գլխավոր",
+                navFarm: "Ֆերմա",
+                navTasks: "Առաջադրանք",
+                navFriends: "Ընկերներ"
+            },
+            en: {
+                minerTag: "Novice Miner",
+                balanceTitle: "Your ARM Balance",
+                energyText: "Energy",
+                adminBtn: "Admin",
+                farmDesc: "Earn ARM tokens passively every hour",
+                tasksTitle: "📋 Complete Tasks",
+                friendsTitle: "👥 Invite Friends",
+                friendsDesc: "Earn 10% from your referral earnings",
+                navHome: "Home",
+                navFarm: "Farm",
+                navTasks: "Tasks",
+                navFriends: "Friends"
+            },
+            ru: {
+                minerTag: "Новичок Майнер",
+                balanceTitle: "Ваш Баланс ARM",
+                energyText: "Энергия",
+                adminBtn: "Админ",
+                farmDesc: "Зарабатывайте токены ARM пассивно каждый час",
+                tasksTitle: "📋 Выполняйте Задания",
+                friendsTitle: "👥 Приглашайте Друзей",
+                friendsDesc: "Получайте 10% от дохода ваших рефералов",
+                navHome: "Главная",
+                navFarm: "Ферма",
+                navTasks: "Задания",
+                navFriends: "Друзья"
+            }
+        };
+
+        function changeAppLanguage(lang) {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][key]) {
+                    el.innerHTML = i18n[lang][key];
+                }
+            });
+        }
 
         function handleTap(e) {
             if (energy <= 0) return;
@@ -174,12 +277,12 @@
             const touch = e.touches ? e.touches[0] : e;
             const floatText = document.createElement('div');
             floatText.innerText = '+1';
-            floatText.className = 'absolute text-2xl font-black text-amber-400 pointer-events-none animate-bounce';
+            floatText.className = 'absolute text-2xl font-black text-amber-300 pointer-events-none animate-bounce z-30';
             floatText.style.left = `${touch.clientX - 10}px`;
             floatText.style.top = `${touch.clientY - 30}px`;
             document.body.appendChild(floatText);
 
-            setTimeout(() => floatText.remove(), 800);
+            setTimeout(() => floatText.remove(), 700);
         }
 
         function switchTab(tabName) {
@@ -193,7 +296,15 @@
             const activeTab = document.getElementById(`tab-${tabName}`);
             const activeNav = document.getElementById(`nav-${tabName}`);
             if (activeTab) activeTab.classList.remove('hidden');
-            if (activeNav) activeNav.className = 'flex flex-col items-center gap-1 text-blue-400 transition';
+            if (activeNav) activeNav.className = 'flex flex-col items-center gap-1 text-amber-400 transition';
+        }
+
+        function openAdminModal() {
+            document.getElementById('admin-modal').classList.remove('hidden');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.add('hidden');
         }
     </script>
 </body>
